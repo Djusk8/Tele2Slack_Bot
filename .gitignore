@@ -1,0 +1,5 @@
+settings.py
+*.session
+*.session-journal
+/.idea
+
