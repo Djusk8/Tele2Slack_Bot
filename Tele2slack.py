@@ -1,18 +1,17 @@
-# A simple script to print some messages.
-
-import settings as s
-from telethon import TelegramClient, events, utils
 import requests
 import json
 import base64
 import os
 import imageio
+from settings import *
+from telethon import TelegramClient, events
+
 
 # Create and start the client so we can make requests (we don't here)
-client = TelegramClient(s.session, s.api_id, s.api_hash).start()
+client = TelegramClient(tele_session, tele_api_id, tele_api_hash).start()
 
-# @client.on(events.NewMessage(chats=('MarketTwits', 'Tele2Slack')))
-@client.on(events.NewMessage(chats=('tele2slack')))
+
+@client.on(events.NewMessage(chats=tele_chats))
 async def normal_handler(event):
 
     # sender = await event.get_sender()
@@ -75,7 +74,7 @@ def upload_photo_to_imgbb(photo: str) -> str:
     with open(photo, "rb") as image_file:
         encoded_string = base64.b64encode(image_file.read())
 
-    response = requests.post(url=s.imgbb_api_url, data=({"key": s.imgbb_api_key, "image": encoded_string}))
+    response = requests.post(url=imgbb_api_url, data=({"key": imgbb_api_key, "image": encoded_string}))
 
     if response.status_code == 200:
         json_data = response.json()
