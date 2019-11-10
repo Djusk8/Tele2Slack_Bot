@@ -29,11 +29,10 @@ async def normal_handler(event):
     json_data = prepare_json_data(formatted_text, media_name)
     send_data_to_slack(json_data)
 
-    send_data_to_slack(formatted_text, media_name)
 
-
-def send_data_to_slack(*args):
+def send_data_to_slack(data):
     # Function that send data in a string to your slack channel using incoming webhook
+    requests.post(slack_url, data=data)
 
 
 def prepare_json_data(text, media):
@@ -106,7 +105,7 @@ def convert_mp4_to_jpg(inputfile):
     reader = imageio.get_reader(inputfile)
     writer = imageio.get_writer(outputfile)
 
-    for im in reader:
+    for im in reader:  # extract the first frame of the video
         writer.append_data(im)
         break
 
@@ -140,9 +139,17 @@ with client:
     print('(Press Ctrl+C to stop this)\n'+'-'*10)
     client.run_until_disconnected()
 
-# def prepare_json_data(text, photo):
+# While you can not add gif attachment to slack using webhook this feature is disabled
+# def convert_mp4_to_gif(inputfile):
+#     """Reference: http://imageio.readthedocs.io/en/latest/examples.html#convert-a-movie"""
 #
-#     photo_url = None
+#     outputfile = inputfile.split('.')[0] + ".gif"
+#     reader = imageio.get_reader(inputfile)
+#     fps = reader.get_meta_data()['fps']
+#     writer = imageio.get_writer(outputfile, fps=fps)
+#     for im in reader:
+#         writer.append_data(im)
+#     writer.close()
 #
 #     return outputfile
 
