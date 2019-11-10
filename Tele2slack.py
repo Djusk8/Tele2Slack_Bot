@@ -26,7 +26,8 @@ async def normal_handler(event):
 
     media_name = await event.message.download_media()
 
-    # TODO Gif
+    json_data = prepare_json_data(formatted_text, media_name)
+    send_data_to_slack(json_data)
 
     send_data_to_slack(formatted_text, media_name)
 
@@ -34,8 +35,6 @@ async def normal_handler(event):
 def send_data_to_slack(*args):
     # Function that send data in a string to your slack channel using incoming webhook
 
-    json_data = prepare_json_data_2(*args)
-    requests.post(s.slack_url, data=json_data)
 
 
 def prepare_json_data_2(text, media):
@@ -145,69 +144,5 @@ with client:
 #
 #     photo_url = None
 #
-#     if photo:
-#         photo_url = upload_photo_to_imgbb(photo)
-#         os.remove(photo)
-#
-#     if photo_url and text:
-#
-#         return json.dumps(
-#             {
-#                 "blocks": [
-#                     {
-#                         "type": "section",
-#                         "text": {
-#                             "type": "mrkdwn",
-#                             "text": text,
-#                         }
-#                     },
-#                     {
-#                         "type": "image",
-#                         "image_url": photo_url,
-#                         "alt_text": "image"
-#                     },
-#                     {
-#                         "type": "divider"
-#                     },
-#                 ]
-#             }
-#         )
-#     elif text:
-#         return json.dumps(
-#             {
-#                 "blocks":
-#                 [
-#                     {
-#                         "type": "section",
-#                         "text":
-#                         {
-#                             "type": "mrkdwn",
-#                             "text": text,
-#                         }
-#                     },
-#                     {
-#                         "type": "divider"
-#                     },
-#                 ]
-#             }
-#         )
-#     elif photo_url:
-#
-#         return json.dumps(
-#             {
-#                 "blocks": [
-#                     {
-#                         "type": "image",
-#                         "image_url": photo_url,
-#                         "alt_text": "image"
-#                     },
-#                     {
-#                         "type": "divider"
-#                     },
-#                 ]
-#             }
-#         )
-#
-
-
+#     return outputfile
 
