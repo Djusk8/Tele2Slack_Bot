@@ -78,27 +78,13 @@ def upload_photo_to_imgbb(photo: str) -> str:
         json_data = response.json()
         photo_url = json_data['data']['display_url']
     else:
-        print(response.status_code)
+        print(response.status_code, "\ninput")
         input()
 
     return photo_url
 
 
-def convert_mp4_to_gif(inputfile):
-    """Reference: http://imageio.readthedocs.io/en/latest/examples.html#convert-a-movie"""
-
-    outputfile = inputfile.split('.')[0] + ".gif"
-    reader = imageio.get_reader(inputfile)
-    fps = reader.get_meta_data()['fps']
-    writer = imageio.get_writer(outputfile, fps=fps)
-    for im in reader:
-        writer.append_data(im)
-    writer.close()
-
-    return outputfile
-
-
-def convert_mp4_to_jpg(inputfile):
+def convert_mp4_to_jpg(inputfile: str) -> str:
     """Reference: http://imageio.readthedocs.io/en/latest/examples.html#convert-a-movie"""
 
     outputfile = inputfile.split('.')[0] + ".jpg"
@@ -115,6 +101,14 @@ def convert_mp4_to_jpg(inputfile):
 
 
 def format_telegram_text_entities_to_slack(text: str, entities: list) -> str:
+    """
+    Prepare text for posting to slack:
+        - double ** replaces with single * to make text bold
+        - todo make something with urls
+    :param text:
+    :param entities: list of entities from telegram message
+    :return: text
+    """
 
     if text:
         text = text.replace("**", "*")
