@@ -36,8 +36,8 @@ def send_data_to_slack(*args):
     # Function that send data in a string to your slack channel using incoming webhook
 
 
-
-def prepare_json_data_2(text, media):
+def prepare_json_data(text, media):
+    # Prepare text and media to
 
     json_str = list()
     json_str.append('{"blocks": [')
