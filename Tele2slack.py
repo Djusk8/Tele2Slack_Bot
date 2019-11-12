@@ -120,7 +120,11 @@ def convert_mp4_to_jpg(inputfile: str) -> str:
 
 
 def format_to_hashtag(m):
-    x = '`' + m.group() + '`'
+    return '`' + m.group() + '`'
+
+
+def change_places(m):
+    x = m.group().replace("\n*", "*\n")
     return x
 
 
@@ -131,6 +135,7 @@ def text_to_slack_format(text: str, entities: list) -> str:
         - double asterisks (**) replaces with single asteriks (*) to make the text bold
         - double underscores (__) replaces with single underscore (_) to make the text italic
         - double tildes (~~) replaces with single tilde (~) to make the text strike
+        - fixes situation when asterisk moved to next string by new line symbol (\n)
         - todo: make something with urls
     :param text: raw text
     :param entities: list of entities from telegram message
@@ -138,10 +143,12 @@ def text_to_slack_format(text: str, entities: list) -> str:
     """
 
     if text:
-        text = re.sub(r'#+\w+', format_to_hashtag, text)
-        text = text.replace("**", "*")
-        text = text.replace("__", "_")
-        text = text.replace("~~", "~")
+        text = re.sub(r'#+\w+', format_to_hashtag, text)    # hash-tags
+        text = text.replace("**", "*")                      # bold text
+        text = text.replace("__", "_")                      # italic text
+        text = text.replace("~~", "~")                      # strike text
+        text = re.sub(r'\*.+\n\*', change_places, text)     #
+
 
     # if entities:
     #     for ent in reversed(entities):
