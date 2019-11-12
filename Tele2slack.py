@@ -33,12 +33,12 @@ async def normal_handler(event):
 
 
 def send_data_to_slack(data):
-    # Function that send data in a string to your slack channel using incoming webhook
+    # Function that send data in a string to slack channel using webhook
     requests.post(slack_url, data=data)
 
 
 def prepare_json_data(text, media):
-    # Prepare text and media to
+    # Prepare text and media for slack
 
     json_str = list()
     json_str.append('{"blocks": [')
@@ -70,6 +70,11 @@ def prepare_json_data(text, media):
 
 
 def upload_photo_to_imgbb(photo: str) -> str:
+    """
+    Upload provided image to imgbb.com hosting
+    :param photo: name of image-file to upload
+    :return: url for uploaded image
+    """
 
     with open(photo, "rb") as image_file:
         encoded_string = base64.b64encode(image_file.read())
@@ -87,7 +92,13 @@ def upload_photo_to_imgbb(photo: str) -> str:
 
 
 def convert_mp4_to_jpg(inputfile: str) -> str:
-    """Reference: http://imageio.readthedocs.io/en/latest/examples.html#convert-a-movie"""
+    """
+    Extract first frame of the video file and save as jpg image. Image saved in working directory
+    Reference: http://imageio.readthedocs.io/en/latest/examples.html#convert-a-movie
+
+    :param inputfile: name of mp4 file to extract frame
+    :return: name of jpg-image file
+    """
 
     outputfile = inputfile.split('.')[0] + ".jpg"
     reader = imageio.get_reader(inputfile)
@@ -110,11 +121,14 @@ def format_to_hashtag(m):
 def format_telegram_text_entities_to_slack(text: str, entities: list) -> str:
     """
     Prepare text for posting to slack:
-        - double ** replaces with single * to make text bold
-        - todo make something with urls
-    :param text:
+        - #hashtags surrounds by apostrophes ` to highlight it
+        - double asterisks (**) replaces with single asteriks (*) to make the text bold
+        - double underscores (__) replaces with single underscore (_) to make the text italic
+        - double tildes (~~) replaces with single tilde (~) to make the text strike
+        - todo: make something with urls
+    :param text: raw text
     :param entities: list of entities from telegram message
-    :return: text
+    :return: formatted text
     """
 
     if text:
