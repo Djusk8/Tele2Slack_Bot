@@ -23,7 +23,7 @@ async def normal_handler(event):
     print(event.text, '\n'+'-'*10)
 
     if event.text:
-        formatted_text = format_telegram_text_entities_to_slack(event.text, event.message.entities)
+        formatted_text = text_to_slack_format(event.text, event.message.entities)
     else:
         formatted_text = None
 
@@ -124,7 +124,7 @@ def format_to_hashtag(m):
     return x
 
 
-def format_telegram_text_entities_to_slack(text: str, entities: list) -> str:
+def text_to_slack_format(text: str, entities: list) -> str:
     """
     Prepare text for posting to slack:
         - #hashtags surrounds by apostrophes ` to highlight it
