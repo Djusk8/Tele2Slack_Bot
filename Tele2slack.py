@@ -20,9 +20,10 @@ async def normal_handler(event):
     # print(name, 'said\n', event.text, '\n----')
     print(event.text, '\n'+'-'*10)
 
-    formatted_text = None
     if event.text:
         formatted_text = format_telegram_text_entities_to_slack(event.text, event.message.entities)
+    else:
+        formatted_text = None
 
     media_name = await event.message.download_media()
 
