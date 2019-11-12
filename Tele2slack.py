@@ -4,6 +4,7 @@ import base64
 import os
 import re
 import imageio
+import time
 from settings import *
 from telethon import TelegramClient, events
 
@@ -81,12 +82,13 @@ def upload_photo_to_imgbb(photo: str) -> str:
 
     response = requests.post(url=imgbb_api_url, data=({"key": imgbb_api_key, "image": encoded_string}))
 
-    if response.status_code == 200:
+    if response.status_code == 200:  # If photo uploaded successfully, return link to photo
         json_data = response.json()
         photo_url = json_data['data']['display_url']
-    else:
-        print(response.status_code, "\ninput")
-        input()
+    else:  # If photo can not be uploaded, wait 10 seconds and try again
+        print(response.status_code, ": Uploading photo error ... waiting 10 sec and try again")
+        time.sleep(10)
+        photo_url = upload_photo_to_imgbb(photo)
 
     return photo_url
 
