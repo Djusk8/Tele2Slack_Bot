@@ -27,9 +27,13 @@ async def normal_handler(event):
     else:
         formatted_text = None
 
-    media_name = await event.message.download_media()
+    if event.message.file and event.message.file.mime_type in ('video/mp4', 'image/jpeg'):
+        file_name = await event.message.download_media()
+    else:
+        # todo make something with docs: doc, pdf and etc
+        file_name = None
 
-    json_data = prepare_json_data(formatted_text, media_name)
+    json_data = prepare_json_data(formatted_text, file_name)
     send_data_to_slack(json_data)
 
 
