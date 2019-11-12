@@ -2,6 +2,7 @@ import requests
 import json
 import base64
 import os
+import re
 import imageio
 from settings import *
 from telethon import TelegramClient, events
@@ -101,6 +102,11 @@ def convert_mp4_to_jpg(inputfile: str) -> str:
     return outputfile
 
 
+def format_to_hashtag(m):
+    x = '`' + m.group() + '`'
+    return x
+
+
 def format_telegram_text_entities_to_slack(text: str, entities: list) -> str:
     """
     Prepare text for posting to slack:
@@ -112,6 +118,7 @@ def format_telegram_text_entities_to_slack(text: str, entities: list) -> str:
     """
 
     if text:
+        text = re.sub(r'#+\w+', format_to_hashtag, text)
         text = text.replace("**", "*")
 
     # if entities:
