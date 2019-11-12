@@ -140,6 +140,8 @@ def format_telegram_text_entities_to_slack(text: str, entities: list) -> str:
     if text:
         text = re.sub(r'#+\w+', format_to_hashtag, text)
         text = text.replace("**", "*")
+        text = text.replace("__", "_")
+        text = text.replace("~~", "~")
 
     # if entities:
     #     for ent in reversed(entities):
