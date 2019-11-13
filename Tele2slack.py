@@ -120,11 +120,13 @@ def convert_mp4_to_jpg(inputfile: str) -> str:
     return outputfile
 
 
-def format_to_hashtag(m):
+def parse_hashtag(m) -> str:
+    """ Surround string (hash-tag) by tildes """
     return '`' + m.group() + '`'
 
 
-def change_places(m):
+def parse_bold(m) -> str:
+    """ Interchange '\n' and '*' """
     x = m.group().replace("\n*", "*\n")
     return x
 
