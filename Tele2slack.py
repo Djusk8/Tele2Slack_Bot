@@ -131,7 +131,18 @@ def parse_bold(m) -> str:
     return x
 
 
-def text_to_slack_format(text: str, entities: list) -> str:
+def parse_links(m):
+    x = m.group()
+    name = re.search(r"\[.*?\]", x)
+    name = name.group()[1:-1]
+    url = re.search(r"\(http.+?\)", x)
+    url = url.group()[1:-1]
+    result = "<" + url + "|" + name + ">"
+    return result
+
+
+# def text_to_slack_format(text: str, entities: list) -> str:
+def text_to_slack_format(text: str) -> str:
     """
     Prepare text for posting to slack:
         - #hashtags surrounds by apostrophes ` to highlight it
@@ -139,32 +150,19 @@ def text_to_slack_format(text: str, entities: list) -> str:
         - double underscores (__) replaces with single underscore (_) to make the text italic
         - double tildes (~~) replaces with single tilde (~) to make the text strike
         - fixes situation when asterisk moved to next string by new line symbol (\n)
-        - todo: make something with urls
+        - parse URL
     :param text: raw text
     :param entities: list of entities from telegram message
     :return: formatted text
     """
 
     if text:
-        text = re.sub(r'#+\w+', format_to_hashtag, text)    # hash-tags
-        text = text.replace("**", "*")                      # bold text
-        text = text.replace("__", "_")                      # italic text
-        text = text.replace("~~", "~")                      # strike text
-        text = re.sub(r'\*.+\n\*', change_places, text)     #
-
-
-    # if entities:
-    #     for ent in reversed(entities):
-    #
-    #         # if 'MessageEntityHashtag' in str(ent):
-    #         if ent.CONSTRUCTOR_ID == 1868782349:    # 'MessageEntityHashtag' type
-    #             pass
-    #         # elif 'MessageEntityBold' in str(ent):
-    #         elif ent.CONSTRUCTOR_ID == 3177253833:  # 'MessageEntityBold' type
-    #             # str = characterinsert(str, ent.length + ent.offset, '*')
-    #             # str = characterinsert(str, ent.length, '*')
-    #             # print(ent)
-    #             pass
+        text = re.sub(r'#+\w+', parse_hashtag, text)    # hash-tags
+        text = text.replace("**", "*")                  # bold text
+        text = text.replace("__", "_")                  # italic text
+        text = text.replace("~~", "~")                  # strike text
+        text = re.sub(r'\*.+\n\*', parse_bold, text)     #
+        text = re.sub(r'\[.*?\]\(http.+?\)', parse_links, text)    #
 
     return text
 
