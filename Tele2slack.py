@@ -23,7 +23,8 @@ async def normal_handler(event):
     print(event.text, '\n'+'-'*10)
 
     if event.text:
-        formatted_text = text_to_slack_format(event.text, event.message.entities)
+        # formatted_text = text_to_slack_format(event.text, event.message.entities)
+        formatted_text = text_to_slack_format(event.text)
     else:
         formatted_text = None
 
@@ -183,4 +184,18 @@ with client:
 #     writer.close()
 #
 #     return outputfile
+
+
+    # if entities:
+    #     for ent in reversed(entities):
+    #
+    #         # if 'MessageEntityHashtag' in str(ent):
+    #         if ent.CONSTRUCTOR_ID == 1868782349:    # 'MessageEntityHashtag' type
+    #             pass
+    #         # elif 'MessageEntityBold' in str(ent):
+    #         elif ent.CONSTRUCTOR_ID == 3177253833:  # 'MessageEntityBold' type
+    #             # str = characterinsert(str, ent.length + ent.offset, '*')
+    #             # str = characterinsert(str, ent.length, '*')
+    #             # print(ent)
+    #             pass
 
