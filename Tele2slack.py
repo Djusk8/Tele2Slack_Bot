@@ -12,7 +12,7 @@ from telethon import TelegramClient, events
 client = TelegramClient(tele_session, tele_api_id, tele_api_hash).start()
 
 
-# Listen 'tele_chats'for new messages
+# Listen Telegram chats for new messages
 @client.on(events.NewMessage(chats=tele_chats))
 async def new_message_handler(event):
     """ Handle new telegram messages, format it and send to slack """
@@ -49,17 +49,18 @@ def prepare_json_data(text, media):
     json_str = list()
     json_str.append('{"blocks": [')
 
+    # if text is provided add it to JSON
     if text:
 
         json_str.append('{"type": "section", "text": ')
         json_str.append(json.dumps({"type": "mrkdwn", "text": text, }))
         json_str.append('}, ')
 
+    # if media is provided, upload it to imgbb and add link to JSON
     if media:
 
         if ".mp4" in media:
             old_name = media
-            # media = convert_mp4_to_gif(media)
             media = convert_mp4_to_jpg(media)
             os.remove(old_name)
 
@@ -70,6 +71,7 @@ def prepare_json_data(text, media):
                         f'"image_url": "{media_url}",'
                         '"alt_text": "image"},')
 
+    # add the divider to the end message
     json_str.append('{"type": "divider"}]}')
 
     return "".join(json_str)
