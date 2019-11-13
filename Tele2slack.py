@@ -8,13 +8,14 @@ import time
 from settings import *
 from telethon import TelegramClient, events
 
-
-# Create and start the client so we can make requests (we don't here)
+# Create and start the client so we can make requests
 client = TelegramClient(tele_session, tele_api_id, tele_api_hash).start()
 
 
+# Listen 'tele_chats'for new messages
 @client.on(events.NewMessage(chats=tele_chats))
-async def normal_handler(event):
+async def new_message_handler(event):
+    """ Handle new telegram messages, format it and send to slack """
 
     # sender = await event.get_sender()
     # sender = event.get_sender()
@@ -23,7 +24,6 @@ async def normal_handler(event):
     print(event.text, '\n'+'-'*10)
 
     if event.text:
-        # formatted_text = text_to_slack_format(event.text, event.message.entities)
         formatted_text = text_to_slack_format(event.text)
     else:
         formatted_text = None
@@ -39,12 +39,12 @@ async def normal_handler(event):
 
 
 def send_data_to_slack(data):
-    # Function that send data in a string to slack channel using webhook
+    """ Make POST request to send text message using Slack webhook """
     requests.post(slack_url, data=data)
 
 
 def prepare_json_data(text, media):
-    # Prepare text and media for slack
+    """" Prepare text and media for slack """
 
     json_str = list()
     json_str.append('{"blocks": [')
@@ -87,10 +87,13 @@ def upload_photo_to_imgbb(photo: str) -> str:
 
     response = requests.post(url=imgbb_api_url, data=({"key": imgbb_api_key, "image": encoded_string}))
 
-    if response.status_code == 200:  # If photo uploaded successfully, return link to photo
+    # If photo uploaded successfully, return link to photo
+    if response.status_code == 200:
         json_data = response.json()
         photo_url = json_data['data']['display_url']
-    else:  # If photo can not be uploaded, wait 10 seconds and try again
+
+    # If photo can not be uploaded, wait 10 seconds and try again
+    else:
         print(response.status_code, ": Uploading photo error ... waiting 10 sec and try again")
         time.sleep(10)
         photo_url = upload_photo_to_imgbb(photo)
@@ -101,7 +104,6 @@ def upload_photo_to_imgbb(photo: str) -> str:
 def convert_mp4_to_jpg(inputfile: str) -> str:
     """
     Extract first frame of the video file and save as jpg image. Image saved in working directory
-    Reference: http://imageio.readthedocs.io/en/latest/examples.html#convert-a-movie
 
     :param inputfile: name of mp4 file to extract frame
     :return: name of jpg-image file
@@ -127,21 +129,21 @@ def parse_hashtag(m) -> str:
 
 def parse_bold(m) -> str:
     """ Interchange '\n' and '*' """
-    x = m.group().replace("\n*", "*\n")
-    return x
+    return m.group().replace("\n*", "*\n")
 
 
 def parse_links(m):
-    x = m.group()
-    name = re.search(r"\[.*?\]", x)
-    name = name.group()[1:-1]
-    url = re.search(r"\(http.+?\)", x)
-    url = url.group()[1:-1]
-    result = "<" + url + "|" + name + ">"
-    return result
+    """
+    Parse string to Slack url format: find 'name' block (surrounded by [square brackets] ) and 'url' block (surrounded
+    by parenthesises) and return url-string using template "<url|name>"
+    """
+    name = re.search(r"\[.*?\]", m.group())     # find the name
+    name = name.group()[1:-1]                   # remove the square brackets
+    url = re.search(r"\(http.+?\)", m.group())  # find the url
+    url = url.group()[1:-1]                     # remove parenthesises
+    return "<" + url + "|" + name + ">"
 
 
-# def text_to_slack_format(text: str, entities: list) -> str:
 def text_to_slack_format(text: str) -> str:
     """
     Prepare text for posting to slack:
@@ -152,18 +154,16 @@ def text_to_slack_format(text: str) -> str:
         - fixes situation when asterisk moved to next string by new line symbol (\n)
         - parse URL
     :param text: raw text
-    :param entities: list of entities from telegram message
     :return: formatted text
     """
 
     if text:
-        text = re.sub(r'#+\w+', parse_hashtag, text)    # hash-tags
-        text = text.replace("**", "*")                  # bold text
-        text = text.replace("__", "_")                  # italic text
-        text = text.replace("~~", "~")                  # strike text
-        text = re.sub(r'\*.+\n\*', parse_bold, text)     #
-        text = re.sub(r'\[.*?\]\(http.+?\)', parse_links, text)    #
-
+        text = re.sub(r'#+\w+', parse_hashtag, text)                # highlight hash-tags
+        text = text.replace("**", "*")                              # format telegram bold text to slack bold
+        text = re.sub(r'\*.+\n\*', parse_bold, text)                # fix '\n*' situation
+        text = text.replace("__", "_")                              # format telegram italic text to slack italic
+        text = text.replace("~~", "~")                              # format telegram strike text to slack strike
+        text = re.sub(r'\[.*?\]\(http.+?\)', parse_links, text)     # parse links
     return text
 
 
