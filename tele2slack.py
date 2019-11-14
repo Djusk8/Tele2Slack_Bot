@@ -2,7 +2,7 @@ import requests
 
 from settings import *
 from telethon import TelegramClient, events
-from text_processor import *
+from data_processor import *
 
 # Create and start the client so we can make requests
 client = TelegramClient(tele_session, tele_api_id, tele_api_hash).start()
