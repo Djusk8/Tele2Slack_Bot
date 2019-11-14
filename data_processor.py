@@ -89,14 +89,14 @@ def convert_mp4_to_jpg(inputfile: str) -> str:
     return outputfile
 
 
-def parse_hashtag(m) -> str:
-    """ Surround string (hash-tag) by tildes """
-    return '`' + m.group() + '`'
-
-
-def parse_bold(m) -> str:
-    """ Interchange '\n' and '*' """
-    return m.group().replace("\n*", "*\n")
+# def parse_hashtag(m) -> str:
+#     """ Surround string (hash-tag) by tildes """
+#     return '`' + m.group() + '`'
+#
+#
+# def parse_bold(m) -> str:
+#     """ Interchange '\n' and '*' """
+#     return m.group().replace("\n*", "*\n")
 
 
 def parse_links(m):
@@ -111,7 +111,7 @@ def parse_links(m):
     return "<" + url + "|" + name + ">"
 
 
-def text_to_slack_format(text: str) -> str:
+def text_to_slack_format(txt: str) -> str:
     """
     Prepare text for posting to slack:
         - #hashtags surrounds by apostrophes ` to highlight it
@@ -120,17 +120,23 @@ def text_to_slack_format(text: str) -> str:
         - double tildes (~~) replaces with single tilde (~) to make the text strike
         - fixes situation when asterisk moved to next string by new line symbol (\n)
         - parse URL
-    :param text: raw text
+    :param txt: raw text
     :return: formatted text
     """
-    if text:
-        text = re.sub(r'#+\w+', parse_hashtag, text)                # highlight hash-tags
-        text = text.replace("**", "*")                              # format telegram bold text to slack bold
-        text = re.sub(r'\*.+\n\*', parse_bold, text)                # fix '\n*' situation
-        text = text.replace("__", "_")                              # format telegram italic text to slack italic
-        text = text.replace("~~", "~")                              # format telegram strike text to slack strike
-        text = re.sub(r'\[.*?\]\(http.+?\)', parse_links, text)     # parse links
-    return text
+    if txt:
+        txt = txt.replace("__", "_")    # format telegram italic text to slack italic
+        txt = txt.replace("~~", "~")    # format telegram strike text to slack strike
+        txt = txt.replace("**", "*")    # format telegram bold text to slack bold
+
+        txt = re.sub(r'(?<!`)(#\w+)', '`\\1`', txt)                 # highlight hash-tags
+        txt = re.sub(r'\[.*?\]\(http.+?\)', parse_links, txt)       # parse links
+
+        txt = re.sub(r'(\*.+)(\n+)\*', '\\1*\\2', txt)                  # fix '\n*' situation
+
+        # for "bold" text (surrounded by asterisks) if there is no whitespace before/after asterisk add it
+        txt = re.sub(r'(\S)(\*.+\*)', '\\1 \\2', txt)
+        txt = re.sub(r'(\*.+\*)(\S)', '\\1 \\2', txt)
+    return txt
 
 
 # While you can not add gif attachment to slack using webhook this feature is disabled
