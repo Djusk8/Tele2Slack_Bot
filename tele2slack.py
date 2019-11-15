@@ -13,9 +13,7 @@ client = TelegramClient(tele_session, tele_api_id, tele_api_hash).start()
 async def new_message_handler(event):
     """ Handle new telegram messages, format it and send to slack """
 
-    # sender = await event.get_sender()
     # sender = event.get_sender()
-    # name = utils.get_display_name(sender)
     # print(name, 'said\n', event.text, '\n----')
     print(event.text, '\n'+'-'*10)
 

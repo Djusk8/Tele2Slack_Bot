@@ -133,7 +133,7 @@ def text_to_slack_format(txt: str) -> str:
 
         txt = re.sub(r'(\*.+)(\n+)\*', '\\1*\\2', txt)                  # fix '\n*' situation
 
-        # for "bold" text (surrounded by asterisks) if there is no whitespace before/after asterisk add it
+        # for *bold* (surrounded by asterisks)  text if there is no whitespace before/after asterisk add it
         txt = re.sub(r'(\S)(\*.+\*)', '\\1 \\2', txt)
         txt = re.sub(r'(\*.+\*)(\S)', '\\1 \\2', txt)
     return txt
@@ -152,18 +152,4 @@ def text_to_slack_format(txt: str) -> str:
 #     writer.close()
 #
 #     return outputfile
-
-
-# if entities:
-#     for ent in reversed(entities):
-#
-#         # if 'MessageEntityHashtag' in str(ent):
-#         if ent.CONSTRUCTOR_ID == 1868782349:    # 'MessageEntityHashtag' type
-#             pass
-#         # elif 'MessageEntityBold' in str(ent):
-#         elif ent.CONSTRUCTOR_ID == 3177253833:  # 'MessageEntityBold' type
-#             # str = characterinsert(str, ent.length + ent.offset, '*')
-#             # str = characterinsert(str, ent.length, '*')
-#             # print(ent)
-#             pass
 
