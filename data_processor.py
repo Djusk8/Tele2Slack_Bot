@@ -85,18 +85,7 @@ def convert_mp4_to_jpg(inputfile: str) -> str:
         break
 
     writer.close()
-
     return outputfile
-
-
-# def parse_hashtag(m) -> str:
-#     """ Surround string (hash-tag) by tildes """
-#     return '`' + m.group() + '`'
-#
-#
-# def parse_bold(m) -> str:
-#     """ Interchange '\n' and '*' """
-#     return m.group().replace("\n*", "*\n")
 
 
 def parse_links(m):
@@ -126,7 +115,7 @@ def text_to_slack_format(txt: str) -> str:
         - double underscores (__) replaces with single underscore (_) to make the text italic
         - double tildes (~~) replaces with single tilde (~) to make the text strike
         - fixes situation when asterisk moved to next string by new line symbol (\n)
-        - parse URL
+        - parse URL from telegram to slack format
     :param txt: raw text
     :return: formatted text
     """

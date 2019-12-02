@@ -5,6 +5,11 @@ from data_processor import *
 # Create and start the client so we can make requests
 client = TelegramClient(tele_session, tele_api_id, tele_api_hash).start()
 
+# client = TelegramClient(tele_session, tele_api_id, tele_api_hash).start(bot_token=tele_token)
+# client.start(bot_token=tele_token)+7
+# client.start()
+# await client.connect()
+# await client.is_user_authorized()
 
 # Listen Telegram chats for new messages
 @client.on(events.NewMessage(chats=tele_chats))
@@ -23,6 +28,10 @@ async def new_message_handler(event):
     # if event.message.file and event.message.file.mime_type in ('video/mp4', 'image/jpeg'):
     if event.message.file and event.message.file.mime_type == 'image/jpeg':
         file_name = await event.message.download_media()
+        # sender = await event.get_sender()
+        # url = ("https://t.me/" + str(sender.username) + "/" + str(event.message.id))
+        # response = requests.get(url)
+        # print(response)
     else:
         # todo make something with docs: doc, pdf and etc
         file_name = None
@@ -39,32 +48,3 @@ def send_data_to_slack(data):
 with client:
     print('(Press Ctrl+C to stop this)\n'+'-'*10)
     client.run_until_disconnected()
-
-# While you can not add gif attachment to slack using webhook this feature is disabled
-# def convert_mp4_to_gif(inputfile):
-#     """Reference: http://imageio.readthedocs.io/en/latest/examples.html#convert-a-movie"""
-#
-#     outputfile = inputfile.split('.')[0] + ".gif"
-#     reader = imageio.get_reader(inputfile)
-#     fps = reader.get_meta_data()['fps']
-#     writer = imageio.get_writer(outputfile, fps=fps)
-#     for im in reader:
-#         writer.append_data(im)
-#     writer.close()
-#
-#     return outputfile
-
-
-    # if entities:
-    #     for ent in reversed(entities):
-    #
-    #         # if 'MessageEntityHashtag' in str(ent):
-    #         if ent.CONSTRUCTOR_ID == 1868782349:    # 'MessageEntityHashtag' type
-    #             pass
-    #         # elif 'MessageEntityBold' in str(ent):
-    #         elif ent.CONSTRUCTOR_ID == 3177253833:  # 'MessageEntityBold' type
-    #             # str = characterinsert(str, ent.length + ent.offset, '*')
-    #             # str = characterinsert(str, ent.length, '*')
-    #             # print(ent)
-    #             pass
-
