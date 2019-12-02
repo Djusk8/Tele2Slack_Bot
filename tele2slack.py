@@ -1,5 +1,3 @@
-import requests
-
 from settings import *
 from telethon import TelegramClient, events
 from data_processor import *
@@ -22,7 +20,8 @@ async def new_message_handler(event):
     else:
         formatted_text = None
 
-    if event.message.file and event.message.file.mime_type in ('video/mp4', 'image/jpeg'):
+    # if event.message.file and event.message.file.mime_type in ('video/mp4', 'image/jpeg'):
+    if event.message.file and event.message.file.mime_type == 'image/jpeg':
         file_name = await event.message.download_media()
     else:
         # todo make something with docs: doc, pdf and etc
