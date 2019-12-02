@@ -104,11 +104,18 @@ def parse_links(m):
     Parse string to Slack url format: find 'name' block (surrounded by [square brackets] ) and 'url' block (surrounded
     by parenthesises) and return url-string using template "<url|name>"
     """
-    name = re.search(r"\[.*?\]", m.group())     # find the name
+
+    name = re.search(r"\[.*?\n*\]", m.group())     # find the name
     name = name.group()[1:-1]                   # remove the square brackets
+
+    new_line_sym = re.search(r"\n+", name)
+    # if where are one or more new line symbols (\n) in the string, save and remove it
+    if new_line_sym:
+        name = name.replace(new_line_sym.group(), "")
+
     url = re.search(r"\(http.+?\)", m.group())  # find the url
     url = url.group()[1:-1]                     # remove parenthesises
-    return "<" + url + "|" + name + ">"
+    return "<" + url + "|" + name + ">" + (new_line_sym.group() if new_line_sym else "")
 
 
 def text_to_slack_format(txt: str) -> str:
@@ -129,7 +136,7 @@ def text_to_slack_format(txt: str) -> str:
         txt = txt.replace("**", "*")    # format telegram bold text to slack bold
 
         txt = re.sub(r'(?<!`)(#\w+)', '`\\1`', txt)                 # highlight hash-tags
-        txt = re.sub(r'\[.*?\]\(http.+?\)', parse_links, txt)       # parse links
+        txt = re.sub(r'\[.*?\n*\]\(http.+?\)', parse_links, txt)    # find and parse links
 
         txt = re.sub(r'(\*.+)(\n+)\*', '\\1*\\2', txt)                  # fix '\n*' situation
 
