@@ -2,7 +2,7 @@ import json
 import base64
 import os
 import re
-import imageio
+# import imageio
 import time
 import requests
 
@@ -24,10 +24,10 @@ def prepare_json_data(text, media):
     # if media is provided, upload it to imgbb and add link to JSON
     if media:
 
-        if ".mp4" in media:
-            old_name = media
-            media = convert_mp4_to_jpg(media)
-            os.remove(old_name)
+        # if ".mp4" in media:
+        #     old_name = media
+        #     media = convert_mp4_to_jpg(media)
+        #     os.remove(old_name)
 
         media_url = upload_photo_to_imgbb(media)
         os.remove(media)
@@ -66,26 +66,6 @@ def upload_photo_to_imgbb(photo: str) -> str:
         photo_url = upload_photo_to_imgbb(photo)
 
     return photo_url
-
-
-def convert_mp4_to_jpg(inputfile: str) -> str:
-    """
-    Extract first frame of the video file and save as jpg image. Image saved in working directory
-
-    :param inputfile: name of mp4 file to extract frame
-    :return: name of jpg-image file
-    """
-
-    outputfile = inputfile.split('.')[0] + ".jpg"
-    reader = imageio.get_reader(inputfile)
-    writer = imageio.get_writer(outputfile)
-
-    for im in reader:  # extract the first frame of the video
-        writer.append_data(im)
-        break
-
-    writer.close()
-    return outputfile
 
 
 def parse_links(m):
@@ -147,5 +127,26 @@ def text_to_slack_format(txt: str) -> str:
 #         writer.append_data(im)
 #     writer.close()
 #
+#     return outputfile
+
+
+
+# def convert_mp4_to_jpg(inputfile: str) -> str:
+#     """
+#     Extract first frame of the video file and save as jpg image. Image saved in working directory
+#
+#     :param inputfile: name of mp4 file to extract frame
+#     :return: name of jpg-image file
+#     """
+#
+#     outputfile = inputfile.split('.')[0] + ".jpg"
+#     reader = imageio.get_reader(inputfile)
+#     writer = imageio.get_writer(outputfile)
+#
+#     for im in reader:  # extract the first frame of the video
+#         writer.append_data(im)
+#         break
+#
+#     writer.close()
 #     return outputfile
 
