@@ -87,6 +87,16 @@ def parse_links(m):
     return "<" + url + "|" + name + ">" + (new_line_sym.group() if new_line_sym else "")
 
 
+def parse_bold_lines(m):
+    """
+
+    """
+    x = re.sub(r"(\n+)", "*\\1*", m.group())    # _______
+    x = re.sub(r"\*\*", "", x)                  # remove double asterisks
+
+    return x
+
+
 def text_to_slack_format(txt: str) -> str:
     """
     Prepare text for posting to slack:
@@ -112,6 +122,9 @@ def text_to_slack_format(txt: str) -> str:
         # for *bold* (surrounded by asterisks)  text if there is no whitespace before/after asterisk add it
         txt = re.sub(r'(\S)(\*.+\*)', '\\1 \\2', txt)
         txt = re.sub(r'(\*.+\*)(\S)', '\\1 \\2', txt)
+
+        txt = re.sub(r'\*[^*]*\*', parse_bold_lines, txt)
+
     return txt
 
 
