@@ -1,16 +1,14 @@
 import json
 import base64
-import os
 import re
-# import imageio
 import time
 import requests
 
 from settings import imgbb_api_url, imgbb_api_key
 
 
-def prepare_json_data(text, media):
-    """" Prepare text and media for slack """
+def prepare_json_data(text, media_url):
+    """" Convert provided data to JSON format """
 
     json_str = list()
     json_str.append('{"blocks": [')
@@ -21,13 +19,8 @@ def prepare_json_data(text, media):
         json_str.append(json.dumps({"type": "mrkdwn", "text": text, }))
         json_str.append('}, ')
 
-    # if media is provided, upload it to imgbb and add link to JSON
-    if media:
-
-        # if ".mp4" in media:
-        #     old_name = media
-        #     media = convert_mp4_to_jpg(media)
-        #     os.remove(old_name)
+    # if media_url is provided add link to JSON
+    if media_url:
 
         media_url = upload_photo_to_imgbb(media)
         os.remove(media)
@@ -84,6 +77,7 @@ def parse_links(m):
 
     url = re.search(r"\(http.+?\)", m.group())  # find the url
     url = url.group()[1:-1]                     # remove parenthesises
+
     return "<" + url + "|" + name + ">" + (new_line_sym.group() if new_line_sym else "")
 
 
@@ -100,15 +94,15 @@ def parse_bold_lines(m):
 def text_to_slack_format(txt: str) -> str:
     """
     Prepare text for posting to slack:
-        - #hashtags surrounds by apostrophes ` to highlight it
-        - double asterisks (**) replaces with single asteriks (*) to make the text bold
-        - double underscores (__) replaces with single underscore (_) to make the text italic
-        - double tildes (~~) replaces with single tilde (~) to make the text strike
-        - fixes situation when asterisk moved to next string by new line symbol (\n)
+        - double underscores (__) replaces with single underscore (_) to make text italic
+        - double tildes (~~) replaces with single tilde (~) to make text strike
+        - parse asterisks to make text bold
+        - #hashtags surrounds with apostrophes (`) to highlight it
         - parse URL from telegram to slack format
     :param txt: raw text
     :return: formatted text
     """
+
     if txt:
         txt = txt.replace("__", "_")    # format telegram italic text to slack italic
         txt = txt.replace("~~", "~")    # format telegram strike text to slack strike
@@ -127,39 +121,4 @@ def text_to_slack_format(txt: str) -> str:
 
     return txt
 
-
-# While you can not add gif attachment to slack using webhook this feature is disabled
-# def convert_mp4_to_gif(inputfile):
-#     """Reference: http://imageio.readthedocs.io/en/latest/examples.html#convert-a-movie"""
-#
-#     outputfile = inputfile.split('.')[0] + ".gif"
-#     reader = imageio.get_reader(inputfile)
-#     fps = reader.get_meta_data()['fps']
-#     writer = imageio.get_writer(outputfile, fps=fps)
-#     for im in reader:
-#         writer.append_data(im)
-#     writer.close()
-#
-#     return outputfile
-
-
-
-# def convert_mp4_to_jpg(inputfile: str) -> str:
-#     """
-#     Extract first frame of the video file and save as jpg image. Image saved in working directory
-#
-#     :param inputfile: name of mp4 file to extract frame
-#     :return: name of jpg-image file
-#     """
-#
-#     outputfile = inputfile.split('.')[0] + ".jpg"
-#     reader = imageio.get_reader(inputfile)
-#     writer = imageio.get_writer(outputfile)
-#
-#     for im in reader:  # extract the first frame of the video
-#         writer.append_data(im)
-#         break
-#
-#     writer.close()
-#     return outputfile
 
