@@ -28,8 +28,9 @@ async def new_message_handler(event):
         # todo make something with docs: doc, pdf and etc
         media_url = None
 
-    json_data = prepare_json_data(formatted_text, file_name)
-    send_data_to_slack(json_data)
+    if event.text or media_url:
+        json_data = prepare_json_data(formatted_text, media_url)
+        send_data_to_slack(json_data)
 
 
 def send_data_to_slack(data):
