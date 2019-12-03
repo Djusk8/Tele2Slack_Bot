@@ -22,14 +22,9 @@ def prepare_json_data(text, media_url):
     # if media_url is provided add link to JSON
     if media_url:
 
-        media_url = upload_photo_to_imgbb(media)
-        os.remove(media)
+        json_str.append('{"type": "image", "image_url": "{}", "alt_text": "image"},'.format(media_url))
 
-        json_str.append('{"type": "image",'
-                        f'"image_url": "{media_url}",'
-                        '"alt_text": "image"},')
-
-    # add the divider to the end message
+    # add the divider to the message end
     json_str.append('{"type": "divider"}]}')
 
     return "".join(json_str)

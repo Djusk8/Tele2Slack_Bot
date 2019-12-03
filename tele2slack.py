@@ -1,3 +1,4 @@
+import os
 from settings import *
 from telethon import TelegramClient, events
 from data_processor import *
@@ -21,9 +22,11 @@ async def new_message_handler(event):
     # if telegram message has attached picture, download it and upload to imgbb
     if event.message.file and event.message.file.mime_type == 'image/jpeg':
         file_name = await event.message.download_media()
+        media_url = upload_photo_to_imgbb(file_name)
+        os.remove(file_name)
     else:
         # todo make something with docs: doc, pdf and etc
-        file_name = None
+        media_url = None
 
     json_data = prepare_json_data(formatted_text, file_name)
     send_data_to_slack(json_data)
