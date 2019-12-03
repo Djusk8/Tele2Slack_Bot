@@ -81,14 +81,35 @@ def parse_links(m):
     return "<" + url + "|" + name + ">" + (new_line_sym.group() if new_line_sym else "")
 
 
-def parse_bold_lines(m):
+def parse_bold_text(text):
+    """
+    - double asterisks (**) replaces with single asteriks (*) to make the text bold
+    - fixes situation when asterisk moved to next string by new line symbol (\n)
+
+    :param text:
+    :return:
     """
 
-    """
-    x = re.sub(r"(\n+)", "*\\1*", m.group())    # _______
-    x = re.sub(r"\*\*", "", x)                  # remove double asterisks
+    # format telegram bold text to slack bold: change double asterisks with single ones
+    text = text.replace("**", "*")
 
-    return x
+    # for bold text (surrounded by *asterisks*) if there is no whitespace before and after asterisk add it
+    text = re.sub(r'(\S)(\*.+\*)', '\\1 \\2', text)
+    text = re.sub(r'(\*.+\*)(\S)', '\\1 \\2', text)
+
+    # find text blocks surrounded by asterisks and wrap each text line (ends with \n) with asterisk
+    text = re.sub(r'\*[^*]*\*', parse_bold_lines, text)
+
+    return text
+
+
+def parse_bold_lines(text):
+    """ Wraps with asterisk text lines which ends with \n  """
+
+    result = re.sub(r"(\n+)", "*\\1*", text.group())    # _______
+    result = re.sub(r"\*\*", "", result)                # remove double asterisks
+
+    return result
 
 
 def text_to_slack_format(txt: str) -> str:
@@ -106,18 +127,11 @@ def text_to_slack_format(txt: str) -> str:
     if txt:
         txt = txt.replace("__", "_")    # format telegram italic text to slack italic
         txt = txt.replace("~~", "~")    # format telegram strike text to slack strike
-        txt = txt.replace("**", "*")    # format telegram bold text to slack bold
+
+        txt = parse_bold_text(txt)
 
         txt = re.sub(r'(?<!`)(#\w+)', '`\\1`', txt)                 # highlight hash-tags
         txt = re.sub(r'\[.*?\n*\]\(http.+?\)', parse_links, txt)    # find and parse links
-
-        txt = re.sub(r'(\*.+)(\n+)\*', '\\1*\\2', txt)                  # fix '\n*' situation
-
-        # for *bold* (surrounded by asterisks)  text if there is no whitespace before/after asterisk add it
-        txt = re.sub(r'(\S)(\*.+\*)', '\\1 \\2', txt)
-        txt = re.sub(r'(\*.+\*)(\S)', '\\1 \\2', txt)
-
-        txt = re.sub(r'\*[^*]*\*', parse_bold_lines, txt)
 
     return txt
 
