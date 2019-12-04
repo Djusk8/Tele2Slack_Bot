@@ -18,14 +18,13 @@ Slack using [Incoming Webhooks](https://api.slack.com/messaging/webhooks) ......
 # Requirements:
  
 * [telethon](https://github.com/LonamiWebs/Telethon) for
-* [imageio](https://github.com/imageio/imageio) to extract image from gif attachments
 * [requests](https://requests.kennethreitz.org/en/master/) to send post's to Slack using Incoming Webhooks
 
 # Limitations:
 
 While Slack Incoming Webhooks can be used to send text messages only:
- * it's impossible to attach any file to message. All images uploaded to [imgbb.com](https://imgbb.com/) photo hosting and added to message as url. 
-If any video or gif attached to telegram message, the first frame is extracted from the media and added to Slack message like photo-url
+* it's impossible to attach any file to message. All images uploaded to [imgbb.com](https://imgbb.com/) photo hosting and added to message as url
+* any other attachment won`t be added to Slack message
 * if the original telegram message will be edited or deleted nothing happens with the appropriate slack message
 
 # TODO
