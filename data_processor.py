@@ -7,7 +7,7 @@ import requests
 from settings import imgbb_api_url, imgbb_api_key
 
 
-def prepare_json_data(text, media_url):
+def prepare_json_data(text, media_url=None):
     """" Convert provided data to JSON format """
 
     json_str = list()
@@ -31,10 +31,11 @@ def prepare_json_data(text, media_url):
     return "".join(json_str)
 
 
-def upload_photo_to_imgbb(photo: str) -> str:
+def upload_photo_to_imgbb(photo: str, count=10):
     """
     Upload provided image to imgbb.com hosting
     :param photo: name of image-file to upload
+    :param count: number of attempts. After 10`s - return None instead of link
     :return: url for uploaded image
     """
 
@@ -51,8 +52,11 @@ def upload_photo_to_imgbb(photo: str) -> str:
     # If photo can not be uploaded, wait 10 seconds and try again
     else:
         print(response.status_code, ": Uploading photo error ... waiting 10 sec and try again")
+        # After 10 unsuccessful attempts return None instead of image url
+        if not count:
+            return None
         time.sleep(10)
-        photo_url = upload_photo_to_imgbb(photo)
+        photo_url = upload_photo_to_imgbb(photo, count-1)
 
     return photo_url
 
